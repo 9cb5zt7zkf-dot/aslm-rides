@@ -23,7 +23,7 @@ export function useCounterpartProfile(userId: string | null) {
       .select("*")
       .eq("id", userId)
       .maybeSingle()
-      .then(({ data }) => setProfile((data as Profile) ?? null));
+      .then(({ data }: { data: Profile | null }) => setProfile(data ?? null));
   }, [userId]);
 
   return profile;
@@ -46,7 +46,7 @@ export function useDriverVehicle(driverId: string | null) {
       .eq("driver_id", driverId)
       .eq("is_active", true)
       .maybeSingle()
-      .then(({ data }) => setVehicle((data as Vehicle) ?? null));
+      .then(({ data }: { data: Vehicle | null }) => setVehicle(data ?? null));
   }, [driverId]);
 
   return vehicle;

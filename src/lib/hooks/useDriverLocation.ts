@@ -26,8 +26,8 @@ export function useDriverLocation(driverId: string | null) {
       .select("*")
       .eq("driver_id", driverId)
       .maybeSingle()
-      .then(({ data }) => {
-        if (active) setStatus((data as DriverStatus) ?? null);
+      .then(({ data }: { data: DriverStatus | null }) => {
+        if (active) setStatus(data ?? null);
       });
 
     const channel = supabase

@@ -42,7 +42,7 @@ export function DriverHomeClient() {
       .order("requested_at", { ascending: false })
       .limit(1)
       .maybeSingle()
-      .then(({ data }) => setActiveRide((data as Ride) ?? null));
+      .then(({ data }: { data: Ride | null }) => setActiveRide(data ?? null));
   }, [userId]);
 
   useEffect(() => {

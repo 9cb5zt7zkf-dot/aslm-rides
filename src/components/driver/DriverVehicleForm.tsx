@@ -28,8 +28,8 @@ export function DriverVehicleForm() {
       .eq("driver_id", userId)
       .eq("is_active", true)
       .maybeSingle()
-      .then(({ data }) => {
-        const vehicle = data as Vehicle | null;
+      .then(({ data }: { data: Vehicle | null }) => {
+        const vehicle = data;
         if (vehicle) {
           setExisting(vehicle);
           setForm({

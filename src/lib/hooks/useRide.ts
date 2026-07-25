@@ -25,9 +25,9 @@ export function useRide(rideId: string) {
       .select("*")
       .eq("id", rideId)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data }: { data: Ride | null }) => {
         if (active) {
-          setRide((data as Ride) ?? null);
+          setRide(data ?? null);
           setLoading(false);
         }
       });
