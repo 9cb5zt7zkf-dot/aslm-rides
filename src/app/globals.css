@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    height: 100%;
+  }
+
+  body {
+    @apply h-full bg-ink-bg text-ink-fg antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  #__next {
+    height: 100%;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-gold ring-offset-2 ring-offset-ink-bg;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* prevents iOS Safari auto-zoom on focus */
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply mx-auto flex h-full min-h-screen w-full max-w-md flex-col bg-ink-bg;
+  }
+
+  .bottom-sheet {
+    @apply rounded-t-sheet border-t border-ink-border bg-ink-card shadow-sheet;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-gold focus:px-4 focus:py-2 focus:text-black;
+  }
+}
+
+/* Mapbox GL base styles are imported per-page where the map is used. */
