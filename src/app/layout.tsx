@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
+import { RegisterServiceWorker } from "@/components/shared/RegisterServiceWorker";
 import "./globals.css";
 
 const heading = Playfair_Display({
@@ -22,6 +23,11 @@ export const metadata: Metadata = {
     icon: "/icons/icon-192.png",
     apple: "/icons/icon-192.png",
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "ASLM Rides",
+  },
 };
 
 export const viewport: Viewport = {
@@ -39,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="skip-link">
           Skip to main content
         </a>
+        <RegisterServiceWorker />
         <div id="main">{children}</div>
       </body>
     </html>
