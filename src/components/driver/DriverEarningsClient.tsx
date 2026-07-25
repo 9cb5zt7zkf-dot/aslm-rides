@@ -30,7 +30,7 @@ export function DriverEarningsClient() {
       .eq("driver_id", userId)
       .eq("status", "completed")
       .order("completed_at", { ascending: false })
-      .then(({ data }) => setRides((data as Ride[]) ?? []));
+      .then(({ data }: { data: Ride[] | null }) => setRides(data ?? []));
   }, [userId]);
 
   if (!isSupabaseConfigured()) {

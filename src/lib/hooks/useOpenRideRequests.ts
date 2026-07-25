@@ -28,8 +28,8 @@ export function useOpenRideRequests(enabled: boolean) {
       .select("*")
       .eq("status", "requested")
       .order("requested_at", { ascending: true })
-      .then(({ data }) => {
-        if (active) setRides((data as Ride[]) ?? []);
+      .then(({ data }: { data: Ride[] | null }) => {
+        if (active) setRides(data ?? []);
       });
 
     const channel = supabase

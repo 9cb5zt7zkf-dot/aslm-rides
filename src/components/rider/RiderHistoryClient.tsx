@@ -25,7 +25,7 @@ export function RiderHistoryClient() {
       .eq("rider_id", userId)
       .in("status", ["completed", "cancelled"])
       .order("requested_at", { ascending: false })
-      .then(({ data }) => setRides((data as Ride[]) ?? []));
+      .then(({ data }: { data: Ride[] | null }) => setRides(data ?? []));
   }, [userId]);
 
   if (!isSupabaseConfigured()) {
