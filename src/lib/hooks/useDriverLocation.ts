@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { DriverStatus } from "@/types/ride";
 
@@ -35,7 +36,7 @@ export function useDriverLocation(driverId: string | null) {
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "driver_status", filter: `driver_id=eq.${driverId}` },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<DriverStatus>) => {
           if (active) setStatus(payload.new as DriverStatus);
         }
       )

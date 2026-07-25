@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Profile } from "@/types/ride";
 
@@ -35,7 +36,7 @@ export function useProfile(): ProfileState {
 
     supabase.auth.getSession().then(({ data }) => loadProfile(data.session?.user.id ?? null));
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
       loadProfile(session?.user.id ?? null);
     });
 

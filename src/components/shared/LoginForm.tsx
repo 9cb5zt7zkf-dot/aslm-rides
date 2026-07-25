@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, KeyRound, MailCheck } from "lucide-react";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/Button";
 import { requestOtp, verifyOtp } from "@/lib/supabase/auth";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -26,7 +27,7 @@ export function LoginForm({ role, redirectTo }: { role: Role; redirectTo: string
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
     if (!supabase) return;
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
       if (event === "SIGNED_IN" && session) {
         router.replace(redirectTo);
         router.refresh();

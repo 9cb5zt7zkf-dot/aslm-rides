@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Ride } from "@/types/ride";
 
@@ -37,7 +38,7 @@ export function useRide(rideId: string) {
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "rides", filter: `id=eq.${rideId}` },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Ride>) => {
           if (active) setRide(payload.new as Ride);
         }
       )
