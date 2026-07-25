@@ -1,22 +1,39 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, KeyRound } from "lucide-react";
+import { Mail, KeyRound, MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { requestOtp, verifyOtp } from "@/lib/supabase/auth";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { NotConfiguredNotice } from "@/components/shared/NotConfiguredNotice";
 import type { Role } from "@/types/ride";
 
 export function LoginForm({ role, redirectTo }: { role: Role; redirectTo: string }) {
   const router = useRouter();
-  const [step, setStep] = useState<"email" | "code">("email");
+  const [step, setStep] = useState<"email" | "sent">("email");
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
+  const [showCodeEntry, setShowCodeEntry] = useState(false);
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // If sign-in completes in this same tab (e.g. the confirmation link was
+  // clicked here, or Supabase synced the session from another tab), pick
+  // it up automatically instead of leaving the user stuck on this screen.
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) return;
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        router.replace(redirectTo);
+        router.refresh();
+      }
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [router, redirectTo]);
 
   if (!isSupabaseConfigured()) {
     return <NotConfiguredNotice what="Sign-in needs a live Supabase project." />;
@@ -26,13 +43,13 @@ export function LoginForm({ role, redirectTo }: { role: Role; redirectTo: string
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const result = await requestOtp(email, role, fullName);
+    const result = await requestOtp(email, role, fullName, redirectTo);
     setLoading(false);
     if (!result.ok) {
-      setError(result.error ?? "Could not send code.");
+      setError(result.error ?? "Could not send the confirmation email.");
       return;
     }
-    setStep("code");
+    setStep("sent");
   }
 
   async function handleVerifyCode(e: FormEvent) {
@@ -59,7 +76,7 @@ export function LoginForm({ role, redirectTo }: { role: Role; redirectTo: string
           {role === "rider" ? "Welcome, rider" : "Welcome, driver"}
         </h1>
         <p className="mt-1.5 text-[14px] text-ink-fg-muted">
-          {step === "email" ? "Sign in with your email — no password needed." : `Enter the 6-digit code sent to ${email}`}
+          {step === "email" ? "Sign in with your email — no password needed." : `Check your inbox for ${email}`}
         </p>
       </div>
 
@@ -96,41 +113,66 @@ export function LoginForm({ role, redirectTo }: { role: Role; redirectTo: string
           </div>
           {error ? <p className="text-[13px] text-danger">{error}</p> : null}
           <Button type="submit" loading={loading} className="mt-2">
-            Send code
+            Send confirmation email
           </Button>
         </form>
       ) : (
-        <form onSubmit={handleVerifyCode} className="mt-10 space-y-4">
-          <div>
-            <label htmlFor="code" className="block text-[13px] font-medium text-ink-fg-muted">
-              6-digit code
-            </label>
-            <div className="relative mt-1.5">
-              <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-fg-muted" />
-              <input
-                id="code"
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                required
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="w-full rounded-xl border border-ink-border bg-ink-muted py-3 pl-11 pr-4 tracking-[0.3em] text-ink-fg outline-none focus:border-gold"
-              />
-            </div>
+        <div className="mt-10 space-y-4">
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-ink-border bg-ink-card p-5 text-center">
+            <MailCheck className="h-6 w-6 text-gold" />
+            <p className="text-[14px] text-ink-fg">
+              We sent a confirmation link to <span className="font-medium">{email}</span>. Open it on this device
+              and this page will continue automatically.
+            </p>
           </div>
-          {error ? <p className="text-[13px] text-danger">{error}</p> : null}
-          <Button type="submit" loading={loading} className="mt-2">
-            Verify &amp; continue
-          </Button>
+
+          {!showCodeEntry ? (
+            <button
+              type="button"
+              onClick={() => setShowCodeEntry(true)}
+              className="w-full text-center text-[13px] text-ink-fg-muted hover:text-ink-fg"
+            >
+              Got a 6-digit code instead?
+            </button>
+          ) : (
+            <form onSubmit={handleVerifyCode} className="space-y-4">
+              <div>
+                <label htmlFor="code" className="block text-[13px] font-medium text-ink-fg-muted">
+                  6-digit code
+                </label>
+                <div className="relative mt-1.5">
+                  <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-fg-muted" />
+                  <input
+                    id="code"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    required
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    className="w-full rounded-xl border border-ink-border bg-ink-muted py-3 pl-11 pr-4 tracking-[0.3em] text-ink-fg outline-none focus:border-gold"
+                  />
+                </div>
+              </div>
+              {error ? <p className="text-[13px] text-danger">{error}</p> : null}
+              <Button type="submit" loading={loading}>
+                Verify &amp; continue
+              </Button>
+            </form>
+          )}
+
           <button
             type="button"
-            onClick={() => setStep("email")}
+            onClick={() => {
+              setStep("email");
+              setShowCodeEntry(false);
+              setError(null);
+            }}
             className="w-full text-center text-[13px] text-ink-fg-muted hover:text-ink-fg"
           >
             Use a different email
           </button>
-        </form>
+        </div>
       )}
     </div>
   );
