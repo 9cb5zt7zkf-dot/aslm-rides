@@ -17,8 +17,17 @@ export function RegisterServiceWorker() {
       });
     };
 
-    window.addEventListener("load", register);
-    return () => window.removeEventListener("load", register);
+    // By the time this effect runs (after hydration), the window "load"
+    // event has almost always already fired, so listening for it here
+    // would mean register() never runs. Register immediately if the page
+    // is already fully loaded, and only fall back to the event listener
+    // for the rare case this effect runs before load.
+    if (document.readyState === "complete") {
+      register();
+    } else {
+      window.addEventListener("load", register);
+      return () => window.removeEventListener("load", register);
+    }
   }, []);
 
   return null;
