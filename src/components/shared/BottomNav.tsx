@@ -1,14 +1,21 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
 import { cx } from "@/lib/utils";
 
 export type NavItem = {
   href: string;
   label: string;
-  icon: LucideIcon;
+  // A rendered icon element (e.g. <Home className="h-5 w-5" />), not the
+  // icon component itself. This layout renders inside a Server Component
+  // (rider/(app)/layout.tsx, driver/(app)/layout.tsx) — passing the icon
+  // *component reference* (a function) as a prop into this Client
+  // Component isn't serializable across that boundary and throws
+  // "Functions cannot be passed directly to Client Components". A
+  // rendered ReactNode is a plain serializable element, so it's safe.
+  icon: ReactNode;
 };
 
 export function BottomNav({ items }: { items: NavItem[] }) {
@@ -19,7 +26,6 @@ export function BottomNav({ items }: { items: NavItem[] }) {
       {items.map((item) => {
         const href: string = item.href;
         const active = pathname === href || pathname.startsWith(`${href}/`);
-        const Icon = item.icon;
         return (
           <Link
             key={item.href}
@@ -29,7 +35,7 @@ export function BottomNav({ items }: { items: NavItem[] }) {
               active ? "text-gold" : "text-ink-fg-muted"
             )}
           >
-            <Icon className="h-5 w-5" />
+            {item.icon}
             {item.label}
           </Link>
         );

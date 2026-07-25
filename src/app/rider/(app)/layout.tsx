@@ -20,9 +20,9 @@ export default async function RiderAppLayout({ children }: { children: React.Rea
       <div className="flex-1 pb-4">{children}</div>
       <BottomNav
         items={[
-          { href: "/rider/home", label: "Ride", icon: Home },
-          { href: "/rider/history", label: "History", icon: Clock },
-          { href: "/rider/profile", label: "Profile", icon: User },
+          { href: "/rider/home", label: "Ride", icon: <Home className="h-5 w-5" /> },
+          { href: "/rider/history", label: "History", icon: <Clock className="h-5 w-5" /> },
+          { href: "/rider/profile", label: "Profile", icon: <User className="h-5 w-5" /> },
         ]}
       />
     </div>

@@ -20,9 +20,9 @@ export default async function DriverAppLayout({ children }: { children: React.Re
       <div className="flex-1 pb-4">{children}</div>
       <BottomNav
         items={[
-          { href: "/driver/home", label: "Drive", icon: Car },
-          { href: "/driver/earnings", label: "Earnings", icon: Wallet },
-          { href: "/driver/profile", label: "Profile", icon: User },
+          { href: "/driver/home", label: "Drive", icon: <Car className="h-5 w-5" /> },
+          { href: "/driver/earnings", label: "Earnings", icon: <Wallet className="h-5 w-5" /> },
+          { href: "/driver/profile", label: "Profile", icon: <User className="h-5 w-5" /> },
         ]}
       />
     </div>
