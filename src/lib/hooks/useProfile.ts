@@ -34,7 +34,7 @@ export function useProfile(): ProfileState {
       if (active) setState({ loading: false, profile: (data as Profile) ?? null, userId });
     }
 
-    supabase.auth.getSession().then(({ data }) => loadProfile(data.session?.user.id ?? null));
+    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => loadProfile(data.session?.user.id ?? null));
 
     const { data: subscription } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
       loadProfile(session?.user.id ?? null);
